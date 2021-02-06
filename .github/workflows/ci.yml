@@ -1,0 +1,53 @@
+
+name: GitHub Action
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        configuration: [Debug, Release]
+    env:
+      Solution_Name: Devbridge.AzurePowerTools.sln
+    runs-on: windows-latest 
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Install .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+
+    - name: Setup MSBuild.exe
+      uses: microsoft/setup-msbuild@v1.0.2
+
+    - name: Setup NuGet.exe
+      uses: nuget/setup-nuget@v1
+      
+    - run: nuget restore $env:Solution_Name
+
+    - name: Build the application
+      run: msbuild $env:Solution_Name /p:Configuration=$env:Configuration
+      env:
+        Configuration: ${{ matrix.configuration }}
+        
+    - name: Upload build artifacts BasicAuthentication
+      uses: actions/upload-artifact@v2
+      with:
+        name: BasicAuthentication
+        path: Devbridge.BasicAuthentication\bin
+  
+    - name: Upload build artifacts BackupDatabaseServer
+      uses: actions/upload-artifact@v2
+      with:
+        name: BackupDatabaseServer
+        path: Devbridge.BackupDatabaseServer\bin
+    
+    
