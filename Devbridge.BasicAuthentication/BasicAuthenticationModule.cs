@@ -115,14 +115,12 @@ namespace Devbridge.BasicAuthentication
             string password = null;
             if (!ExtractBasicCredentials(authorizationHeader, ref userName, ref password))
             {
-                httpApp.CompleteRequest();
                 return;
             }
 
             // Validate the user credentials
             if (!ValidateCredentials(userName, password))
             {
-                httpApp.CompleteRequest();
                 return;
             }
 
